@@ -1,0 +1,20 @@
+{{- if  .Values.elasticsearch.enabled }}
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: {{ .Values.elasticsearch.name }}
+spec:
+  version: {{ .Values.elasticsearch.version }}
+  nodeSets:
+  - name: default
+    count: {{ .Values.elasticsearch.count }}
+    config:
+      node.store.allow_mmap: false
+    podTemplate:
+        spec:
+          containers:
+            - name: elasticsearch
+              resources:
+{{ toYaml .Values.elasticsearch.resources | indent 16 }}
+{{ end }}
