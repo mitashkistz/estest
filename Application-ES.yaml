@@ -1,0 +1,52 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch
+  namespace: default
+  annotations:
+    kyverno.io/disallow-missing-finalizer: "ignore"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: elastic-deployment
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - PruneLast=true
+      - CreateNamespace=true
+  source:
+    repoURL: https://github.com/mitashkistz/estest.git
+    path: .
+    targetRevision: v0.1.3
+    helm:
+      values: |
+        elasticsearch:
+          name: product42
+          count: 1
+          version: 8.13.2
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 0.5
+              memory: 1Gi
+        kibana:
+          name: product42
+          count: 1
+          version: 8.13.2
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 0.5
+              memory: 1Gi
+        filebeat:
+          enabled: false
+        logstash:
+          enabled: false
